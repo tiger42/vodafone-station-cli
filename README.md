@@ -542,7 +542,7 @@ $ npm install -g vodafone-station-cli
 $ vodafone-station-cli COMMAND
 running command...
 $ vodafone-station-cli (--version)
-vodafone-station-cli/1.2.8 darwin-arm64 node-v18.3.0
+vodafone-station-cli/1.2.8 linux-x64 node-v20.12.2
 $ vodafone-station-cli --help [COMMAND]
 USAGE
   $ vodafone-station-cli COMMAND
@@ -551,11 +551,32 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
+* [`vodafone-station-cli calllog`](#vodafone-station-cli-calllog)
 * [`vodafone-station-cli diagnose`](#vodafone-station-cli-diagnose)
 * [`vodafone-station-cli discover`](#vodafone-station-cli-discover)
 * [`vodafone-station-cli docsis`](#vodafone-station-cli-docsis)
 * [`vodafone-station-cli help [COMMAND]`](#vodafone-station-cli-help-command)
 * [`vodafone-station-cli restart`](#vodafone-station-cli-restart)
+
+## `vodafone-station-cli calllog`
+
+Get the current call log in JSON format.
+
+```
+USAGE
+  $ vodafone-station-cli calllog [-p <value>]
+
+FLAGS
+  -p, --password=<value>  router/modem password
+
+DESCRIPTION
+  Get the current call log in JSON format.
+
+EXAMPLES
+  $ vodafone-station-cli calllog -p PASSWORD
+```
+
+_See code: [src/commands/calllog.ts](https://github.com/totev/vodafone-station-cli/blob/v1.2.8/src/commands/calllog.ts)_
 
 ## `vodafone-station-cli diagnose`
 
