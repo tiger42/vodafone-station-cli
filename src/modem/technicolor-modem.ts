@@ -1,5 +1,5 @@
 import { Log } from '../logger'
-import { DocsisChannelType, DocsisStatus, HumanizedDocsis31ChannelStatus, HumanizedDocsisChannelStatus, Modem, normalizeModulation } from './modem'
+import { DocsisChannelType, DocsisStatus, HumanizedDocsis31ChannelStatus, HumanizedDocsisChannelStatus, Modem, normalizeModulation, CallLogData, CallType } from './modem'
 import { deriveKeyTechnicolor } from './tools/crypto'
 
 export interface TechnicolorBaseResponse{
@@ -83,6 +83,31 @@ export interface TechnicolorDocsis31ChannelStatus {
     ChannelType: DocsisChannelType;
 }
 
+export interface TechnicolorCallTblEntry {
+  __id: string
+  endTime: string;
+  startTime: string;
+  date: string;
+  externalNumber: string;
+  Direction: 'Outgoing' | 'Incoming';
+  type: 'OUTGOING CALL' | 'INCOMIMG ACCEPT' | 'MISSED CALL';  // "INCOMIMG" is really a typo in the modem API!
+}
+
+export interface TechnicolorCallTbl {
+  CallTbl: TechnicolorCallTblEntry[];
+}
+
+export interface TechnicolorLineData {
+  error: string;
+  message: string;
+  data: TechnicolorCallTbl;
+}
+
+export interface TechnicolorCallLogData {
+  '0': TechnicolorLineData;
+  '1': TechnicolorLineData;
+}
+
 export function normalizeChannelStatus(channelStatus: TechnicolorDocsisChannelStatus): HumanizedDocsisChannelStatus {
   return {
     channelId: channelStatus.channelid,
@@ -139,6 +164,23 @@ export function normalizeDocsisStatus(channelStatus: TechnicolorDocsisStatus): D
     upstreamOfdma: channelStatus.data.ofdma_upstream.map(normalizeUpstreamOfdmaChannelStatus),
     time: new Date().toISOString()
   }
+}
+
+export function normalizeCallLogData(callLog: TechnicolorCallLogData): CallLogData {
+  const convertCalltype = (type: string): CallType => type.replace(/ CALL| ACCEPT/, '').replace('INCOMIMG', 'INCOMING').toLowerCase() as unknown as CallType
+
+  const result = {} as CallLogData
+
+  ['0', '1'].forEach((key: string) => {
+    result[key as keyof CallLogData] = callLog[key as keyof TechnicolorCallLogData].data.CallTbl.map((entry) => ({
+      endTime: entry.endTime,
+      startTime: entry.startTime,
+      date: entry.date,
+      externalNumber: entry.externalNumber,
+      type: convertCalltype(entry.type),
+    }))
+  })
+  return result
 }
 
 export class Technicolor extends Modem {
@@ -207,7 +249,7 @@ export class Technicolor extends Modem {
         'Referer': `http://${this.modemIp}`,
       }
     })
-    
+
     this.logger.debug('Token response: ', tokenResponse)
     const {data: restartResponse} = await this.httpClient.post<TechnicolorBaseResponse>('api/v1/sta_restart',
       'restart=Router%2CWifi%2CVoIP%2CDect%2CMoCA&ui_access=reboot_device', {
@@ -223,6 +265,26 @@ export class Technicolor extends Modem {
       throw new Error(`Could not restart router: ${restartResponse.message}`)
     }
     return restartResponse
+  }
+
+  async callLog(): Promise<CallLogData> {
+    const { data: callLog } = await this.httpClient.get('/api/v1/phone_calllog/1,2/CallTbl', {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Referer': `http://${this.modemIp}`,
+      },
+    })
+
+    if (callLog['0'] && callLog['0']?.error !== 'ok') {
+      this.logger.debug(callLog)
+      throw new Error(`Could not fetch call log: ${callLog['0'].message}`)
+    }
+    if (callLog['1'] && callLog['1']?.error !== 'ok') {
+      this.logger.debug(callLog)
+      throw new Error(`Could not fetch call log: ${callLog['1'].message}`)
+    }
+
+    return normalizeCallLogData(callLog as TechnicolorCallLogData);
   }
 }
 
