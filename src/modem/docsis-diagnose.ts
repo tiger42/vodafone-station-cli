@@ -1,3 +1,4 @@
+import { BAD_MODEM_POWER_LEVEL } from "./constants";
 import type { Diagnose, DiagnosedDocsis31ChannelStatus, DiagnosedDocsisChannelStatus, DiagnosedDocsisStatus, DocsisChannelType, DocsisStatus, Modulation } from "./modem";
 
 export interface Deviation{
@@ -165,6 +166,9 @@ export class UpstreamDeviationOFDMA implements Deviation{
       return FixWithinOneMonth;
     if ( 50 < powerLevel)
       return FixImmediately
+
+    if (powerLevel === BAD_MODEM_POWER_LEVEL)
+      return FixImmediately
     
     throw new Error(`PowerLevel is not within supported range. PowerLevel: ${powerLevel}`);
   }
@@ -236,6 +240,13 @@ export class DownstreamDeviation4096QAM implements Deviation {
   }
 }
 
+export class DownstreamDeviationUnknown implements Deviation {
+  modulation = "UNKNOWN" as any
+  check(powerLevel: number): Diagnose {
+    return FixImmediately;
+  }
+}
+
 export const FixImmediately: Diagnose = {
   description : "Fix immediately",
   deviation: true,
@@ -257,7 +268,7 @@ export const FixWithinOneMonth: Diagnose = {
   color:"yellow"
 }
 
-export function downstreamDeviationFactory(modulation: Modulation): Deviation {
+export function downstreamDeviationFactory(modulation: Modulation | "UNKNOWN"): Deviation {
   switch (modulation) {
   case "64QAM":
     return new DownstreamDeviation64QAM();
@@ -269,6 +280,8 @@ export function downstreamDeviationFactory(modulation: Modulation): Deviation {
     return new DownstreamDeviation2048QAM();
   case "4096QAM":
     return new DownstreamDeviation4096QAM();
+  case "UNKNOWN":
+    return new DownstreamDeviationUnknown();
   default:
     throw new Error(`Unsupported modulation ${modulation}`)
   }

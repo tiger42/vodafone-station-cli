@@ -199,7 +199,7 @@ export class Technicolor extends Modem {
       this.logger.debug('Salt', salt)
 
       if (salt.message && salt.message === 'MSG_LOGIN_150') {
-        throw new Error('A user is already logged in')
+        throw new Error('A user is already logged in. Log out from the other session first.')
       }
 
       const derivedKey = deriveKeyTechnicolor(deriveKeyTechnicolor(password, salt.salt), salt.saltwebui)
@@ -211,6 +211,10 @@ export class Technicolor extends Modem {
         },
       })
       this.logger.debug('Login status', loginResponse)
+
+      if (loginResponse.error === 'error' && loginResponse.message === 'MSG_LOGIN_150') {
+        throw new Error('A user is already logged in. Log out from the other session first.')
+      }
       const {data: messageResponse} = await this.httpClient.get<TechnicolorBaseResponse>('/api/v1/session/menu', {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -219,7 +223,8 @@ export class Technicolor extends Modem {
       })
       this.logger.debug('Message status', messageResponse)
     } catch (error) {
-      this.logger.warn(`Something went wrong with the login ${error}`)
+      this.logger.debug(`Something went wrong with the login ${error}`)
+      throw error
     }
   }
 

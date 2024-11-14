@@ -7,6 +7,8 @@ export type DocsisChannelType = 'OFDM' | 'OFDMA' | 'SC-QAM'
 
 export type Modulation = "16QAM" | "64QAM" | "256QAM" | "1024QAM" | "2048QAM" | "4096QAM"
 
+export type Protocol = "TCP" | "UDP"
+
 export interface HumanizedDocsisChannelStatus {
   channelId: string;
   channelType: DocsisChannelType;
@@ -51,6 +53,20 @@ export interface DiagnosedDocsisStatus {
   time: string;
 }
 
+export interface ExposedHostSettings {
+  serviceName: string;
+  mac: string;
+  protocol: Protocol;
+  startPort: number;
+  endPort: number;
+  enabled: boolean;
+  index: number;
+}
+
+export interface HostExposureSettings {
+  hosts: ExposedHostSettings[];
+}
+
 export type CallType = 'incoming' | 'outgoing' | 'missed';
 
 export interface CallTblEntry {
@@ -71,6 +87,7 @@ export interface GenericModem {
   login(password: string): Promise<void>;
   docsis(): Promise<DocsisStatus>;
   restart(): Promise<unknown>;
+  getHostExposure(): Promise<HostExposureSettings>;
   callLog(): Promise<CallLogData>;
 }
 
@@ -96,6 +113,14 @@ export abstract class Modem implements GenericModem {
   }
 
   logout(): Promise<void> {
+    throw new Error('Method not implemented.')
+  }
+
+  getHostExposure(): Promise<HostExposureSettings> {
+    throw new Error('Method not implemented.')
+  }
+
+  setHostExposure(_: HostExposureSettings): Promise<void> {
     throw new Error('Method not implemented.')
   }
 
