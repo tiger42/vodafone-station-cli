@@ -542,7 +542,7 @@ $ npm install -g vodafone-station-cli
 $ vodafone-station-cli COMMAND
 running command...
 $ vodafone-station-cli (--version)
-vodafone-station-cli/1.2.8 linux-x64 node-v20.12.2
+vodafone-station-cli/1.2.11 linux-x64 node-v23.2.0
 $ vodafone-station-cli --help [COMMAND]
 USAGE
   $ vodafone-station-cli COMMAND
@@ -590,7 +590,7 @@ EXAMPLES
   $ vodafone-station-cli calllog -p PASSWORD
 ```
 
-_See code: [src/commands/calllog.ts](https://github.com/totev/vodafone-station-cli/blob/v1.2.8/src/commands/calllog.ts)_
+_See code: [src/commands/calllog.ts](https://github.com/totev/vodafone-station-cli/blob/v1.2.11/src/commands/calllog.ts)_
 
 ## `vodafone-station-cli diagnose`
 
