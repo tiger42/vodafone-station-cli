@@ -543,7 +543,7 @@ $ npm install -g vodafone-station-cli
 $ vodafone-station-cli COMMAND
 running command...
 $ vodafone-station-cli (--version)
-vodafone-station-cli/1.5.0 darwin-arm64 node-v23.7.0
+vodafone-station-cli/1.5.0 linux-x64 node-v24.2.0
 $ vodafone-station-cli --help [COMMAND]
 USAGE
   $ vodafone-station-cli COMMAND
@@ -552,6 +552,7 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
+* [`vodafone-station-cli calllog`](#vodafone-station-cli-calllog)
 * [`vodafone-station-cli diagnose`](#vodafone-station-cli-diagnose)
 * [`vodafone-station-cli discover`](#vodafone-station-cli-discover)
 * [`vodafone-station-cli docsis`](#vodafone-station-cli-docsis)
@@ -571,6 +572,29 @@ USAGE
 * [`vodafone-station-cli plugins unlink [PLUGIN]`](#vodafone-station-cli-plugins-unlink-plugin)
 * [`vodafone-station-cli plugins update`](#vodafone-station-cli-plugins-update)
 * [`vodafone-station-cli restart`](#vodafone-station-cli-restart)
+
+## `vodafone-station-cli calllog`
+
+Get the current call log in JSON format.
+
+```
+USAGE
+  $ vodafone-station-cli calllog [-i <value>] [-p <value>]
+
+FLAGS
+  -i, --ip=<value>        IP address of the modem/router (default: try 192.168.100.1 and 192.168.0.1)
+  -p, --password=<value>  router/modem password
+
+DESCRIPTION
+  Get the current call log in JSON format.
+
+EXAMPLES
+  $ vodafone-station-cli calllog -p PASSWORD
+
+  $ vodafone-station-cli calllog -p PASSWORD --ip 192.168.100.1
+```
+
+_See code: [src/commands/calllog.ts](https://github.com/totev/vodafone-station-cli/blob/v1.5.0/src/commands/calllog.ts)_
 
 ## `vodafone-station-cli diagnose`
 
@@ -624,7 +648,7 @@ Get the current docsis status as reported by the modem in a JSON format.
 
 ```
 USAGE
-  $ vodafone-station-cli docsis [-i <value>] [-f] [-p <value>] [-w]
+  $ vodafone-station-cli docsis [-f] [-i <value>] [-p <value>] [-w]
 
 FLAGS
   -f, --file              write out a report file under ./reports/{CURRENT_UNIX_TIMESTAMP}_docsisStatus.json
@@ -663,7 +687,7 @@ DESCRIPTION
   Display help for vodafone-station-cli.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.28/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.29/src/commands/help.ts)_
 
 ## `vodafone-station-cli host-exposure disable [ENTRIES]`
 
