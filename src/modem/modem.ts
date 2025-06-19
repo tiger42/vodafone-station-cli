@@ -72,28 +72,28 @@ export interface HostExposureSettings {
   hosts: ExposedHostSettings[]
 }
 
-export type CallType = 'incoming' | 'outgoing' | 'missed';
+export type CallType = 'incoming' | 'missed' | 'outgoing';
 
 export interface CallTblEntry {
-  endTime: string;
-  startTime: string;
   date: string;
+  endTime: string;
   externalNumber: string;
+  startTime: string;
   type: CallType;
 }
 
 export interface CallLogData {
-  '0': CallTblEntry[];
-  '1': CallTblEntry[];
+  0: CallTblEntry[];
+  1: CallTblEntry[];
 }
 
 export interface GenericModem {
+  callLog(): Promise<CallLogData>
   docsis(): Promise<DocsisStatus>
   getHostExposure(): Promise<HostExposureSettings>
   login(password: string): Promise<void>
   logout(): Promise<void>
   restart(): Promise<unknown>
-  callLog(): Promise<CallLogData>
 }
 
 export abstract class Modem implements GenericModem {
@@ -112,6 +112,10 @@ export abstract class Modem implements GenericModem {
 
   get baseUrl(): string {
     return `${this.protocol}://${this.modemIp}`
+  }
+
+  callLog(): Promise<CallLogData> {
+    throw new Error('Method not implemented.')
   }
 
   docsis(): Promise<DocsisStatus> {
@@ -135,10 +139,6 @@ export abstract class Modem implements GenericModem {
   }
 
   setHostExposure(_: HostExposureSettings): Promise<void> {
-    throw new Error('Method not implemented.')
-  }
-
-  callLog(): Promise<CallLogData> {
     throw new Error('Method not implemented.')
   }
 

@@ -1,18 +1,17 @@
-import { Flags } from '@oclif/core';
-import Command, { ipFlag } from '../base-command';
-import { Log } from '../logger';
-import { discoverModemLocation, DiscoveryOptions, ModemDiscovery } from '../modem/discovery';
-import { CallLogData } from '../modem/modem';
-import { modemFactory } from '../modem/factory';
+import {Flags} from '@oclif/core';
+
+import Command, {ipFlag} from '../base-command';
+import {Log} from '../logger';
+import {discoverModemLocation, DiscoveryOptions, ModemDiscovery} from '../modem/discovery';
+import {modemFactory} from '../modem/factory';
+import {CallLogData} from '../modem/modem';
 
 export default class CallLog extends Command {
   static description = 'Get the current call log in JSON format.';
-
   static examples = [
     '$ vodafone-station-cli calllog -p PASSWORD',
     '$ vodafone-station-cli calllog -p PASSWORD --ip 192.168.100.1',
   ];
-
   static flags = {
     ip: ipFlag(),
     password: Flags.string({
@@ -21,7 +20,7 @@ export default class CallLog extends Command {
     }),
   };
 
-async getCallLog(password: string, logger: Log, discoveryOptions?: DiscoveryOptions): Promise<CallLogData> {
+  async getCallLog(password: string, logger: Log, discoveryOptions?: DiscoveryOptions): Promise<CallLogData> {
     const modemLocation = await discoverModemLocation(discoveryOptions);
     const discoveredModem = await new ModemDiscovery(modemLocation, logger).discover();
     const modem = modemFactory(discoveredModem, this.logger);
@@ -44,9 +43,7 @@ async getCallLog(password: string, logger: Log, discoveryOptions?: DiscoveryOpti
 
     const password = flags.password ?? process.env.VODAFONE_ROUTER_PASSWORD;
     if (!password || password === '') {
-      this.log(
-        'You must provide a password either using -p or by setting the environment variable VODAFONE_ROUTER_PASSWORD'
-      );
+      this.log('You must provide a password either using -p or by setting the environment variable VODAFONE_ROUTER_PASSWORD');
       this.exit();
     }
 
@@ -62,7 +59,7 @@ async getCallLog(password: string, logger: Log, discoveryOptions?: DiscoveryOpti
 
       this.exit();
     } catch (error) {
-      this.error(error as Error, { message: 'Something went wrong' });
+      this.error(error as Error, {message: 'Something went wrong'});
     }
   }
 }
