@@ -30,11 +30,14 @@ export async function discoverModemLocation(options: DiscoveryOptions = {}): Pro
   debug(`Probing for modem at IPs: ${defaultIps.join(', ')}`);
 
   try {
+    const axiosConfig = {
+      timeout: 2000,
+    }
     const headRequests = [];
     for (const ip of defaultIps) {
       headRequests.push(
-        axios.head(`http://${ip}`),
-        axios.head(`https://${ip}`),
+        axios.head(`http://${ip}`, axiosConfig),
+        axios.head(`https://${ip}`, axiosConfig),
       );
     }
 
